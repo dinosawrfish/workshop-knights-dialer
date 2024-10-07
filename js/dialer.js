@@ -7,7 +7,7 @@ export default {
 
 // ****************************
 
-var dialpad = [
+var nearbyKeys = [
 	[4, 6],
 	[6, 8],
 	[7, 9],
@@ -25,22 +25,39 @@ function reachableKeys(startingDigit) {
 }
 
 function countPaths(startingDigit,hopCount) {
-	// TODO: given the digit/key to start from and
-	// the number of hops to take, return a count
-	// of all the possible paths that could be
-	// traversed
-	return 0;
+	if (hopCount == 0) return 1;
+	var pathCount = 0;
+	for (let digit of nearbyKeys[startingDigit]) {
+		pathCount += countPaths(digit, hopCount-1);
+	}
+
+	return pathCount;
 }
 
 function listAcyclicPaths(startingDigit) {
-	// TODO: given the digit/key to start from,
-	// return a list of the distinct acyclic
-	// paths that are possible to traverse
-	//
-	// e.g. [
-	//   [4, 3, 8, 1, 6, 7, 2, 9],
-	//   [4, 3, 8, 1, 6, 0],
-	//   ...
-	// ]
-	return [];
+	var paths = [];
+	var nextHops = nearbyKeys[startingDigit];
+	for (let nextHop of nextHops) {
+		let path = [startingDigit, nextHop];
+		followPath(path, paths);
+	}
+
+	return paths;
+}
+
+function followPath(path, paths) {
+	var nextHops = nearbyKeys[path[path.length - 1]];
+	var pathFowardFound = false;
+
+	for (let nextHop of nextHops) {
+		if (!path.includes(nextHop)) {
+			pathFowardFound = true;
+			let nextPath = [...path, nextHop];
+			followPath(nextPath, paths);
+		}
+	}
+
+	if (!pathFowardFound) {
+		paths.push(path);
+	}
 }
